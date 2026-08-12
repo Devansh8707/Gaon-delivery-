@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#16a34a">
+<title>गाँव डिलीवरी</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f3f8f3;color:#17301f}
+.app{max-width:520px;margin:auto;min-height:100vh;background:#fff;padding-bottom:78px}
+header{position:sticky;top:0;z-index:5;background:#fff;padding:14px 16px;border-bottom:1px solid #e8eee9;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;gap:10px;align-items:center}.logo{width:42px;height:42px;border-radius:13px;background:#16a34a;color:#fff;display:grid;place-items:center;font-size:22px}.brand b{font-size:19px}.brand small{display:block;color:#6b7c70}
+.cartBtn{border:0;background:#eaf8ee;border-radius:14px;padding:10px 13px;font-size:18px;position:relative}.badge{position:absolute;right:-4px;top:-6px;background:#ef4444;color:#fff;border-radius:20px;font-size:11px;padding:2px 6px}
+.hero{margin:16px;border-radius:22px;padding:25px 20px;color:#fff;background:linear-gradient(135deg,#087f5b,#20a466);box-shadow:0 8px 22px #087f5b25}.hero small{background:#f7c948;color:#26320f;padding:5px 9px;border-radius:10px}.hero h1{margin:14px 0 5px;font-size:25px}.hero p{margin:0;opacity:.9}
+.search{margin:0 16px 16px;padding:13px 15px;border:1px solid #dce8df;border-radius:15px;font-size:16px;width:calc(100% - 32px);outline:none}
+h2{font-size:19px;margin:18px 16px 12px}.cats{display:flex;gap:10px;overflow:auto;padding:0 16px 6px}.cat{border:1px solid #dfe9e1;background:#fff;border-radius:14px;padding:10px 13px;white-space:nowrap}.cat.active{background:#16a34a;color:#fff;border-color:#16a34a}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 16px}.card{border:1px solid #e5ece7;border-radius:17px;overflow:hidden;background:#fff;box-shadow:0 3px 12px #12301a08}.pic{height:125px;background:linear-gradient(135deg,#e9f7ed,#d9eee0);display:grid;place-items:center;font-size:48px}.card .info{padding:11px}.card h3{margin:0 0 5px;font-size:16px}.price{font-weight:800;color:#15803d;font-size:18px}.add{margin-top:9px;width:100%;border:0;border-radius:11px;background:#16a34a;color:#fff;padding:10px;font-weight:700}
+.page{display:none}.page.show{display:block}.empty{text-align:center;padding:55px 25px;color:#718075}.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.cartItem{margin:10px 16px;padding:13px;border:1px solid #e3ebe5;border-radius:15px}.qty button{width:32px;height:32px;border:0;border-radius:9px;background:#e9f6ed;font-size:18px}.qty{display:flex;align-items:center;gap:9px}.summary{margin:16px;padding:16px;background:#f4faf5;border-radius:16px}.primary{width:100%;border:0;background:#16a34a;color:#fff;padding:14px;border-radius:13px;font-size:16px;font-weight:800}.field{display:block;margin:10px 16px}.field span{display:block;font-weight:700;margin-bottom:5px}.field input,.field textarea{width:100%;padding:12px;border:1px solid #d9e4dc;border-radius:12px;font-size:15px}.order{margin:12px 16px;padding:14px;border:1px solid #e1e9e3;border-radius:15px}.status{display:inline-block;margin-top:7px;padding:5px 9px;border-radius:9px;background:#e8f7ed;color:#16713a;font-size:12px;font-weight:700}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);height:67px;background:#fff;border-top:1px solid #e5ece7;display:flex;z-index:10}nav button{flex:1;border:0;background:#fff;color:#64736a;font-size:12px}nav button b{display:block;font-size:22px;margin-bottom:2px}nav button.active{color:#159447}
+.notice{margin:16px;padding:13px;border-radius:13px;background:#fff7db;color:#725c00;font-size:13px}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+ <div class="brand"><div class="logo">🌿</div><div><b>गाँव डिलीवरी</b><small>Fresh • Fast • Local</small></div></div>
+ <button class="cartBtn" onclick="showPage('cart')">🛒<span id="badge" class="badge">0</span></button>
+</header>
+
+<section id="home" class="page show">
+ <div class="hero"><small>मुख्य डिलीवरी</small><h1>आपके गाँव की अपनी ऑनलाइन दुकान</h1><p>जरूरी सामान घर तक आसान तरीके से।</p></div>
+ <input id="search" class="search" placeholder="सामान खोजें..." oninput="renderProducts()">
+ <h2>श्रेणियाँ</h2>
+ <div class="cats">
+  <button class="cat active" onclick="setCat('सभी',this)">सभी</button>
+  <button class="cat" onclick="setCat('किराना',this)">🌾 किराना</button>
+  <button class="cat" onclick="setCat('घरेलू सामान',this)">✨ घरेलू सामान</button>
+  <button class="cat" onclick="setCat('स्टेशनरी',this)">📒 स्टेशनरी</button>
+  <button class="cat" onclick="setCat('पर्सनल केयर',this)">🧴 पर्सनल केयर</button>
+ </div>
+ <h2>सभी सामान</h2><div id="products" class="grid"></div>
+</section>
+
+<section id="cart" class="page">
+ <h2>🛒 आपका कार्ट</h2><div id="cartList"></div>
+ <div id="cartSummary"></div>
+</section>
+
+<section id="checkout" class="page">
+ <h2>📦 डिलीवरी जानकारी</h2>
+ <div class="notice">सही मोबाइल नंबर और पता दें ताकि सामान आसानी से पहुँच सके।</div>
+ <label class="field"><span>नाम *</span><input id="name" placeholder="आपका नाम"></label>
+ <label class="field"><span>मोबाइल नंबर *</span><input id="phone" inputmode="numeric" maxlength="10" placeholder="10 अंकों का नंबर"></label>
+ <label class="field"><span>गाँव *</span><input id="village" placeholder="गाँव का नाम"></label>
+ <label class="field"><span>घर / मोहल्ला</span><input id="address" placeholder="घर नंबर या मोहल्ला"></label>
+ <label class="field"><span>नजदीकी पहचान / Landmark</span><input id="landmark" placeholder="जैसे स्कूल के पास"></label>
+ <label class="field"><span>अतिरिक्त जानकारी</span><textarea id="notes" rows="3" placeholder="Delivery के बारे में कुछ बताना हो"></textarea></label>
+ <div class="summary"><div class="row"><b>कुल राशि</b><b id="checkoutTotal">₹0</b></div><br><button class="primary" onclick="placeOrder()">ऑर्डर प्लेस करें</button></div>
+</section>
+
+<section id="orders" class="page">
+ <h2>📋 मेरे ऑर्डर</h2><div id="ordersList"></div>
+</section>
+
+<nav>
+ <button id="navHome" class="active" onclick="showPage('home')"><b>⌂</b>होम</button>
+ <button id="navCart" onclick="showPage('cart')"><b>🛒</b>कार्ट</button>
+ <button id="navOrders" onclick="showPage('orders')"><b>📦</b>ऑर्डर</button>
+</nav>
+</div>
+
+<script>
+const products=[
+ {id:1,name:'आटा',price:40,cat:'किराना',emoji:'🌾'},
+ {id:2,name:'चावल',price:60,cat:'किराना',emoji:'🍚'},
+ {id:3,name:'चीनी',price:45,cat:'किराना',emoji:'🍬'},
+ {id:4,name:'साबुन',price:30,cat:'पर्सनल केयर',emoji:'🧼'},
+ {id:5,name:'बिस्कुट',price:20,cat:'किराना',emoji:'🍪'},
+ {id:6,name:'डिटर्जेंट',price:70,cat:'घरेलू सामान',emoji:'🧺'},
+ {id:7,name:'कॉपी',price:40,cat:'स्टेशनरी',emoji:'📒'},
+ {id:8,name:'शैम्पू',price:10,cat:'पर्सनल केयर',emoji:'🧴'}
+];
+let cart=JSON.parse(localStorage.getItem('gd_cart')||'{}');
+let orders=JSON.parse(localStorage.getItem('gd_orders')||'[]');
+let cat='सभी';
+
+function save(){localStorage.setItem('gd_cart',JSON.stringify(cart));localStorage.setItem('gd_orders',JSON.stringify(orders));updateBadge();}
+function updateBadge(){document.getElementById('badge').textContent=Object.values(cart).reduce((a,b)=>a+b,0)}
+function setCat(c,el){cat=c;document.querySelectorAll('.cat').forEach(x=>x.classList.remove('active'));el.classList.add('active');renderProducts()}
+function renderProducts(){
+ const q=(document.getElementById('search').value||'').toLowerCase();
+ const list=products.filter(p=>(cat==='सभी'||p.cat===cat)&&p.name.toLowerCase().includes(q));
+ document.getElementById('products').innerHTML=list.map(p=>`<div class="card"><div class="pic">${p.emoji}</div><div class="info"><h3>${p.name}</h3><div class="price">₹${p.price}</div><button class="add" onclick="add(${p.id})">+ कार्ट में डालें</button></div></div>`).join('');
+}
+function add(id){cart[id]=(cart[id]||0)+1;save();renderCart();showPage('cart')}
+function change(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];save();renderCart()}
+function total(){return Object.entries(cart).reduce((s,[id,q])=>s+products.find(p=>p.id==id).price*q,0)}
+function renderCart(){
+ const el=document.getElementById('cartList'), sum=document.getElementById('cartSummary');
+ const ids=Object.keys(cart);
+ if(!ids.length){el.innerHTML='<div class="empty">🛒<br><br>आपका कार्ट खाली है।<br>पहले कुछ सामान जोड़ें।</div>';sum.innerHTML='';return}
+ el.innerHTML=ids.map(id=>{let p=products.find(x=>x.id==id),q=cart[id];return `<div class="cartItem"><div class="row"><div><b>${p.emoji} ${p.name}</b><br><span>₹${p.price} × ${q}</span></div><div class="qty"><button onclick="change(${id},-1)">−</button><b>${q}</b><button onclick="change(${id},1)">+</button></div></div></div>`}).join('');
+ sum.innerHTML=`<div class="summary"><div class="row"><span>कुल</span><b>₹${total()}</b></div><br><button class="primary" onclick="goCheckout()">ऑर्डर करें</button></div>`;
+}
+function goCheckout(){if(!Object.keys(cart).length)return;document.getElementById('checkoutTotal').textContent='₹'+total();showPage('checkout')}
+function placeOrder(){
+ const name=document.getElementById('name').value.trim(),phone=document.getElementById('phone').value.trim(),village=document.getElementById('village').value.trim();
+ if(!name||!/^\d{10}$/.test(phone)||!village){alert('कृपया नाम, सही 10 अंकों का मोबाइल नंबर और गाँव भरें।');return}
+ const id='GD'+Date.now().toString().slice(-8);
+ const items=Object.entries(cart).map(([pid,q])=>{let p=products.find(x=>x.id==pid);return {name:p.name,price:p.price,qty:q}});
+ orders.unshift({id,date:new Date().toLocaleString('hi-IN'),items,total:total(),name,phone,village,address:document.getElementById('address').value,landmark:document.getElementById('landmark').value,notes:document.getElementById('notes').value,status:'ऑर्डर मिला'});
+ cart={};save();renderOrders();alert('ऑर्डर सफलतापूर्वक दर्ज हो गया! आपका Order ID: '+id);showPage('orders');
+}
+function renderOrders(){
+ const el=document.getElementById('ordersList');
+ if(!orders.length){el.innerHTML='<div class="empty">📦<br><br>अभी कोई ऑर्डर नहीं है।</div>';return}
+ el.innerHTML=orders.map(o=>`<div class="order"><div class="row"><b>Order #${o.id}</b><b>₹${o.total}</b></div><small>${o.date}</small><div>${o.items.map(i=>`${i.name} × ${i.qty}`).join(' • ')}</div><span class="status">${o.status}</span></div>`).join('');
+}
+function showPage(page){
+ document.querySelectorAll('.page').forEach(x=>x.classList.remove('show'));document.getElementById(page).classList.add('show');
+ document.querySelectorAll('nav button').forEach(x=>x.classList.remove('active'));
+ if(page==='home')document.getElementById('navHome').classList.add('active');
+ if(page==='cart')document.getElementById('navCart').classList.add('active');
+ if(page==='orders')document.getElementById('navOrders').classList.add('active');
+ if(page==='cart')renderCart(); if(page==='orders')renderOrders(); if(page==='checkout')document.getElementById('checkoutTotal').textContent='₹'+total();
+ scrollTo(0,0);
+}
+renderProducts();renderCart();renderOrders();updateBadge();
+</script>
+</body>
+</html>
